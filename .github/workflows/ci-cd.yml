@@ -3,12 +3,12 @@ name: CI/CD - Todo App
 on:
   push:
     branches:
-      - main   # or your branch name
+      - main
 
 env:
-  ACR_NAME: todoappacrs          # your ACR name
-  AKS_RG: TodoAppRG             # AKS resource group
-  AKS_NAME: TodoAppAKS          # AKS cluster name
+  ACR_NAME: todoappacrs
+  AKS_RG: TodoAppRG
+  AKS_NAME: TodoAppAKS
   BACKEND_IMAGE: todo-backend
   FRONTEND_IMAGE: todo-frontend
 
@@ -56,5 +56,6 @@ jobs:
 
       - name: Deploy to AKS
         run: |
+          kubectl apply -f k8/
           kubectl set image deployment/backend backend=$ACR_NAME.azurecr.io/$BACKEND_IMAGE:${{ github.sha }}
           kubectl set image deployment/frontend frontend=$ACR_NAME.azurecr.io/$FRONTEND_IMAGE:${{ github.sha }}
