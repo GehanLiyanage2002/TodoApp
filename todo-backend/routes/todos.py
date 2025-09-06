@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 import sqlite3
+from models import DB_NAME
 
-DB_NAME = "db.sqlite3"
 todos_bp = Blueprint("todos", __name__)
 
 def get_db_connection():
@@ -9,7 +9,6 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-# GET all todos
 @todos_bp.route("/", methods=["GET"])
 def get_todos():
     conn = get_db_connection()
@@ -17,7 +16,6 @@ def get_todos():
     conn.close()
     return jsonify([dict(todo) for todo in todos])
 
-# POST add todo
 @todos_bp.route("/", methods=["POST"])
 def add_todo():
     data = request.get_json()
@@ -32,7 +30,6 @@ def add_todo():
     conn.close()
     return jsonify({"id": todo_id, "text": text, "completed": False}), 201
 
-# PUT toggle or update todo
 @todos_bp.route("/<int:id>", methods=["PUT"])
 def update_todo(id):
     data = request.get_json()
@@ -48,7 +45,6 @@ def update_todo(id):
     conn.close()
     return jsonify({"message": "Todo updated"}), 200
 
-# DELETE todo
 @todos_bp.route("/<int:id>", methods=["DELETE"])
 def delete_todo(id):
     conn = get_db_connection()

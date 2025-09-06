@@ -9,7 +9,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS todos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             text TEXT NOT NULL,
-            completed BOOLEAN NOT NULL CHECK (completed IN (0,1)),
+            completed INTEGER NOT NULL DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
