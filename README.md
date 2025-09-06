@@ -22,7 +22,7 @@ A modern full-stack **Todo App** built with **React** and **Flask**, containeriz
 | Backend      | Flask, SQLite |
 | DevOps       | Docker, Docker Compose, GitHub Actions |
 | Cloud        | Azure Container Registry (ACR), Azure Kubernetes Service (AKS) |
-| Monitoring (Optional) | Prometheus, Grafana |
+
 
 ---
 
@@ -48,5 +48,5 @@ A modern full-stack **Todo App** built with **React** and **Flask**, containeriz
 
 ---
 
-## 📂 Project Structure
+
 
