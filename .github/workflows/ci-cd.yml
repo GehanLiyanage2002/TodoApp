@@ -56,6 +56,6 @@ jobs:
 
       - name: Deploy to AKS
         run: |
-          kubectl apply -f k8s/
+          kubectl apply -f k8/
           kubectl set image deployment/backend backend=$ACR_NAME.azurecr.io/$BACKEND_IMAGE:${{ github.sha }}
           kubectl set image deployment/frontend frontend=$ACR_NAME.azurecr.io/$FRONTEND_IMAGE:${{ github.sha }}
