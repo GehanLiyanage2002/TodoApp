@@ -1,4 +1,4 @@
-import type { Todo } from "./TodoApp"
+import type { Todo } from "../types/Todo"
 import StatsCard from "./StatsCard"
 import ProgressBar from "./ProgressBar"
 import { FiCheckCircle, FiClock, FiClipboard } from "react-icons/fi"
