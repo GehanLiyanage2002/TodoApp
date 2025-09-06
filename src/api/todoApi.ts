@@ -3,7 +3,7 @@ import type { Todo } from "../types/Todo";
 
 // Use `backend` service in Docker, localhost outside Docker
 const API_URL =
-  process.env.REACT_APP_API_URL || "http://backend:5000/api";
+  process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
 
 export const getTodos = async (): Promise<Todo[]> => {
