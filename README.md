@@ -1,69 +1,52 @@
-# React + TypeScript + Vite
+# Todo App with Full DevOps CI/CD Pipeline
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern full-stack **Todo App** built with **React** and **Flask**, containerized with **Docker**, and deployed on **Azure Kubernetes Service (AKS)** using **CI/CD pipelines**.  
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
 
-## Expanding the ESLint configuration
+- Add, update, delete, and toggle tasks.
+- Filter tasks by **all / active / completed**.
+- Dashboard to track task completion.
+- Mobile-responsive and modern UI with **Tailwind CSS** and **Chakra UI**.
+- Fully containerized backend and frontend with **Docker**.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🛠 Tech Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+| Layer        | Technology |
+|-------------|------------|
+| Frontend     | React, Tailwind CSS, Chakra UI |
+| Backend      | Flask, SQLite |
+| DevOps       | Docker, Docker Compose, GitHub Actions |
+| Cloud        | Azure Container Registry (ACR), Azure Kubernetes Service (AKS) |
+| Monitoring (Optional) | Prometheus, Grafana |
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## ⚙️ DevOps & CI/CD Setup
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. **Containerization**
+   - Backend and frontend are packaged as separate Docker images.
+   - Managed locally with **Docker Compose**.
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+2. **CI/CD Pipeline**
+   - **GitHub Actions** workflow:
+     - Checkout code
+     - Build and run unit tests
+     - Build Docker images
+     - Push images to **Azure Container Registry (ACR)**
+     - Deploy/update services on **AKS**
+   - Automatic deployment on push to `main` branch.
+
+3. **Kubernetes Deployment**
+   - Frontend and backend have separate **deployments and services**.
+   - Nginx load balancer to manage traffic across backend pods.
+   - Rolling updates handled automatically via CI/CD.
+
+---
+
+## 📂 Project Structure
+
