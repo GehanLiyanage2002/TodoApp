@@ -1,10 +1,8 @@
 import axios from "axios";
 import type { Todo } from "../types/Todo";
 
-// Use `backend` service in Docker, localhost outside Docker
-const API_URL =
-  process.env.REACT_APP_API_URL || "http://localhost:5000/api";
-
+// Base API URL
+const API_URL = process.env.REACT_APP_API_URL || "/api";
 
 export const getTodos = async (): Promise<Todo[]> => {
   const res = await axios.get(`${API_URL}/`);
