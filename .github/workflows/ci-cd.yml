@@ -1,0 +1,93 @@
+name: TodoApp CI/CD
+
+on:
+  push:
+    branches: [main]
+
+env:
+  ACR_NAME: youracrname  # Azure Container Registry name
+  RESOURCE_GROUP: yourResourceGroup
+  AKS_CLUSTER: yourAKSCluster
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Setup Node & npm for frontend
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install frontend dependencies
+        run: |
+          cd .
+          npm install
+
+      - name: Run frontend tests
+        run: |
+          npm run test
+
+      # Setup Python for backend
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install backend dependencies
+        run: |
+          pip install -r todo-backend/requirements.txt
+
+      - name: Run backend unit tests
+        run: |
+          pytest todo-backend/tests
+
+  docker-build-and-push:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build and push frontend image
+        run: |
+          az acr build --registry $ACR_NAME --image todo-frontend:${IMAGE_TAG} .
+
+      - name: Build and push backend image
+        run: |
+          az acr build --registry $ACR_NAME --image todo-backend:${IMAGE_TAG} ./todo-backend
+
+  deploy-to-aks:
+    needs: docker-build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Get AKS credentials
+        run: |
+          az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_CLUSTER
+
+      - name: Set image tag variable
+        run: echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
+
+      - name: Deploy to AKS
+        run: |
+          kubectl set image deployment/frontend-deployment frontend=$ACR_NAME.azurecr.io/todo-frontend:${IMAGE_TAG} --record
+          kubectl set image deployment/backend-deployment backend=$ACR_NAME.azurecr.io/todo-backend:${IMAGE_TAG} --record
+          kubectl rollout status deployment/frontend-deployment
+          kubectl rollout status deployment/backend-deployment
