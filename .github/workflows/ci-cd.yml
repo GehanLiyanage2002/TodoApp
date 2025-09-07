@@ -33,51 +33,41 @@ jobs:
           echo "ACR_USERNAME=$ACR_USERNAME" >> $GITHUB_ENV
           echo "ACR_PASSWORD=$ACR_PASSWORD" >> $GITHUB_ENV
 
-      - name: Log in to ACR
+      - name: Docker Login to ACR
         uses: docker/login-action@v2
         with:
           username: ${{ env.ACR_USERNAME }}
           password: ${{ env.ACR_PASSWORD }}
           registry: ${{ env.ACR_NAME }}.azurecr.io
 
+      # Backend build
       - name: Build & Push Backend
         run: |
-          docker build -t $ACR_NAME.azurecr.io/$BACKEND_IMAGE:${{ github.sha }} ./todo-backend
-          docker push $ACR_NAME.azurecr.io/$BACKEND_IMAGE:${{ github.sha }}
-          docker tag $ACR_NAME.azurecr.io/$BACKEND_IMAGE:${{ github.sha }} $ACR_NAME.azurecr.io/$BACKEND_IMAGE:latest
+          docker build -t $ACR_NAME.azurecr.io/$BACKEND_IMAGE:latest ./todo-backend
           docker push $ACR_NAME.azurecr.io/$BACKEND_IMAGE:latest
 
+      # Frontend build
       - name: Build & Push Frontend
         run: |
-          docker build \
-            --build-arg REACT_APP_API_URL=http://backend:5000/api \
-            -t $ACR_NAME.azurecr.io/$FRONTEND_IMAGE:${{ github.sha }} .
-          docker push $ACR_NAME.azurecr.io/$FRONTEND_IMAGE:${{ github.sha }}
-          docker tag $ACR_NAME.azurecr.io/$FRONTEND_IMAGE:${{ github.sha }} $ACR_NAME.azurecr.io/$FRONTEND_IMAGE:latest
+          docker build -t $ACR_NAME.azurecr.io/$FRONTEND_IMAGE:latest .
           docker push $ACR_NAME.azurecr.io/$FRONTEND_IMAGE:latest
 
+      # Get AKS credentials
       - name: Get AKS Credentials
         run: |
           az aks get-credentials --resource-group $AKS_RG --name $AKS_NAME --overwrite-existing
 
-      - name: Deploy to AKS
+      # Deploy backend
+      - name: Deploy Backend
         run: |
-          # Apply ConfigMap first (frontend nginx)
-          kubectl apply -f k8/frontend-nginx-config.yaml
+          kubectl apply -f todo-backend/k8/backend-deployment.yaml
+          kubectl apply -f todo-backend/k8/backend-service.yaml
+          kubectl set image deployment/backend backend=$ACR_NAME.azurecr.io/$BACKEND_IMAGE:latest
 
-          # Deploy backend and frontend
-          kubectl apply -f k8/backend-deployment.yaml
-          kubectl apply -f k8/backend-service.yaml
-          kubectl apply -f k8/frontend-deployment.yaml
-          kubectl apply -f k8/frontend-service.yaml
-
-          # Apply ingress
-          kubectl apply -f k8/todo-app-ingress.yaml
-
-          # Update images
-          kubectl set image deployment/backend backend=$ACR_NAME.azurecr.io/$BACKEND_IMAGE:${{ github.sha }}
-          kubectl set image deployment/frontend frontend=$ACR_NAME.azurecr.io/$FRONTEND_IMAGE:${{ github.sha }}
-
-          # Restart deployments to pick up ConfigMap changes
-          kubectl rollout restart deployment/backend
-          kubectl rollout restart deployment/frontend
+      # Deploy frontend
+      - name: Deploy Frontend
+        run: |
+          kubectl apply -f frontend/k8/frontend-nginx-config.yaml
+          kubectl apply -f frontend/k8/frontend-deployment.yaml
+          kubectl apply -f frontend/k8/frontend-service.yaml
+          kubectl set image deployment/frontend frontend=$ACR_NAME.azurecr.io/$FRONTEND_IMAGE:latest
