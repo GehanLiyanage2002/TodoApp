@@ -19,7 +19,7 @@ RUN npm run build
 FROM nginx:stable-alpine
 
 # Copy Nginx config from k8 folder
-COPY frontend/k8/frontend-nginx-config.yaml /etc/nginx/nginx.conf
+COPY k8/frontend-nginx-config.yaml /etc/nginx/nginx.conf
 
 # Copy build output
 COPY --from=build /app/dist /usr/share/nginx/html
