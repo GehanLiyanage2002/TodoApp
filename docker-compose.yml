@@ -29,18 +29,6 @@ services:
     networks:
       - todo-net
 
-  frontend:
-    build: .
-    container_name: todo-frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - nginx
-    environment:
-      - REACT_APP_API_URL=http://localhost:5000/api
-    networks:
-      - todo-net
-
   nginx:
     image: nginx:stable-alpine
     container_name: nginx
@@ -51,6 +39,18 @@ services:
     depends_on:
       - backend1
       - backend2
+    networks:
+      - todo-net
+
+  frontend:
+    build: .
+    container_name: todo-frontend
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_URL=http://nginx:5000/api
+    depends_on:
+      - nginx
     networks:
       - todo-net
 
