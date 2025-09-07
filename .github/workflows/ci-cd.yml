@@ -60,14 +60,14 @@ jobs:
       # Deploy backend
       - name: Deploy Backend
         run: |
-          kubectl apply -f todo-backend/k8/backend-deployment.yaml
-          kubectl apply -f todo-backend/k8/backend-service.yaml
+          kubectl apply -f k8/backend-deployment.yaml
+          kubectl apply -f k8/backend-service.yaml
           kubectl set image deployment/backend backend=$ACR_NAME.azurecr.io/$BACKEND_IMAGE:latest
 
       # Deploy frontend
       - name: Deploy Frontend
         run: |
-          kubectl apply -f frontend/k8/frontend-nginx-config.yaml
-          kubectl apply -f frontend/k8/frontend-deployment.yaml
-          kubectl apply -f frontend/k8/frontend-service.yaml
+          kubectl apply -f k8/frontend-nginx-config.yaml
+          kubectl apply -f k8/frontend-deployment.yaml
+          kubectl apply -f k8/frontend-service.yaml
           kubectl set image deployment/frontend frontend=$ACR_NAME.azurecr.io/$FRONTEND_IMAGE:latest
