@@ -2,21 +2,23 @@ from flask import Blueprint, request, jsonify
 import sqlite3
 from models import DB_NAME
 
-todos_bp = Blueprint("todos", __name__)
+todos_bp = Blueprint("todos_bp", __name__)
 
 def get_db_connection():
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
     return conn
 
-@todos_bp.route("/", methods=["GET"])
+# GET /api/todos
+@todos_bp.route("/todos", methods=["GET"])
 def get_todos():
     conn = get_db_connection()
     todos = conn.execute("SELECT * FROM todos ORDER BY created_at DESC").fetchall()
     conn.close()
     return jsonify([dict(todo) for todo in todos])
 
-@todos_bp.route("/", methods=["POST"])
+# POST /api/todos
+@todos_bp.route("/todos", methods=["POST"])
 def add_todo():
     data = request.get_json()
     text = data.get("text")
@@ -30,7 +32,8 @@ def add_todo():
     conn.close()
     return jsonify({"id": todo_id, "text": text, "completed": False}), 201
 
-@todos_bp.route("/<int:id>", methods=["PUT"])
+# PUT /api/todos/<id>
+@todos_bp.route("/todos/<int:id>", methods=["PUT"])
 def update_todo(id):
     data = request.get_json()
     text = data.get("text")
@@ -45,7 +48,8 @@ def update_todo(id):
     conn.close()
     return jsonify({"message": "Todo updated"}), 200
 
-@todos_bp.route("/<int:id>", methods=["DELETE"])
+# DELETE /api/todos/<id>
+@todos_bp.route("/todos/<int:id>", methods=["DELETE"])
 def delete_todo(id):
     conn = get_db_connection()
     conn.execute("DELETE FROM todos WHERE id=?", (id,))
