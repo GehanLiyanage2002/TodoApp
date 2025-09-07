@@ -17,7 +17,6 @@ spec:
       containers:
         - name: frontend
           image: todoappacrs.azurecr.io/todo-frontend:latest
-          imagePullPolicy: Always
           ports:
             - containerPort: 80
           volumeMounts:

@@ -2,27 +2,21 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 
-# Accept API URL from build args
+# Accept API URL as build argument
 ARG REACT_APP_API_URL
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
 
-# Copy package files and install dependencies
 COPY package*.json ./
 RUN npm install
-
-# Copy all source files
 COPY . .
 
-# Build the React app with provided API URL
+# Build the app
 RUN npm run build
 
-# Stage 2: Serve via nginx
+# Stage 2: Serve via Nginx
 FROM nginx:stable-alpine
 
-# Copy custom nginx config (SPA routing)
-COPY nginx.conf /etc/nginx/nginx.conf
-
-# Copy build output
+COPY k8/frontend-nginx-config.yaml /etc/nginx/nginx.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 80
