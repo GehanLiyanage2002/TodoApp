@@ -19,7 +19,7 @@ RUN npm run build
 # Stage 2: Serve via nginx
 FROM nginx:stable-alpine
 
-# Copy custom nginx config (with SPA routing fix)
+# Copy custom nginx config (SPA routing)
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy build output
