@@ -44,11 +44,17 @@ jobs:
         run: |
           docker build -t $ACR_NAME.azurecr.io/$BACKEND_IMAGE:${{ github.sha }} ./todo-backend
           docker push $ACR_NAME.azurecr.io/$BACKEND_IMAGE:${{ github.sha }}
+          docker tag $ACR_NAME.azurecr.io/$BACKEND_IMAGE:${{ github.sha }} $ACR_NAME.azurecr.io/$BACKEND_IMAGE:latest
+          docker push $ACR_NAME.azurecr.io/$BACKEND_IMAGE:latest
 
       - name: Build & Push Frontend
         run: |
-          docker build -t $ACR_NAME.azurecr.io/$FRONTEND_IMAGE:${{ github.sha }} .
+          docker build \
+            --build-arg REACT_APP_API_URL=http://nginx:5000/api \
+            -t $ACR_NAME.azurecr.io/$FRONTEND_IMAGE:${{ github.sha }} .
           docker push $ACR_NAME.azurecr.io/$FRONTEND_IMAGE:${{ github.sha }}
+          docker tag $ACR_NAME.azurecr.io/$FRONTEND_IMAGE:${{ github.sha }} $ACR_NAME.azurecr.io/$FRONTEND_IMAGE:latest
+          docker push $ACR_NAME.azurecr.io/$FRONTEND_IMAGE:latest
 
       - name: Get AKS Credentials
         run: |
@@ -59,3 +65,5 @@ jobs:
           kubectl apply -f k8/
           kubectl set image deployment/backend backend=$ACR_NAME.azurecr.io/$BACKEND_IMAGE:${{ github.sha }}
           kubectl set image deployment/frontend frontend=$ACR_NAME.azurecr.io/$FRONTEND_IMAGE:${{ github.sha }}
+          kubectl rollout restart deployment/frontend
+          kubectl rollout restart deployment/backend
