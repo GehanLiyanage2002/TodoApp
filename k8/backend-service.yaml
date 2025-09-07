@@ -2,11 +2,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: backend
+  labels:
+    app: todo-backend
 spec:
   selector:
     app: todo-backend
   ports:
     - protocol: TCP
-      port: 5000
-      targetPort: 5000
-  type: ClusterIP
+      port: 5000        # Service port inside the cluster
+      targetPort: 5000  # Container port
+  type: ClusterIP       # Internal access only; frontend or ingress can reach it
