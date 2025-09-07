@@ -50,7 +50,7 @@ jobs:
       - name: Build & Push Frontend
         run: |
           docker build \
-            --build-arg REACT_APP_API_URL=http://nginx:5000/api \
+            --build-arg REACT_APP_API_URL=http://nginx:backend/api \
             -t $ACR_NAME.azurecr.io/$FRONTEND_IMAGE:${{ github.sha }} .
           docker push $ACR_NAME.azurecr.io/$FRONTEND_IMAGE:${{ github.sha }}
           docker tag $ACR_NAME.azurecr.io/$FRONTEND_IMAGE:${{ github.sha }} $ACR_NAME.azurecr.io/$FRONTEND_IMAGE:latest
